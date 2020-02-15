@@ -1,7 +1,6 @@
-import sys
-sys.path.append(r"c:\users\ngora\appdata\local\packages\pythonsoftwarefoundation.python.3.7_qbz5n2kfra8p0\localcache\local-packages\python37\site-packages")
 import requests
 from bs4 import BeautifulSoup
+import pandas
 
 ticker = []
 name = []
@@ -23,6 +22,11 @@ for x in info.findAll('tr'):
 for TK in ticker:
     financesite = requests.get('https://finance.yahoo.com/quote/'+TK + '/key-statistics')
     financeinfo = BeautifulSoup(financesite.text, 'html.parser')
-    mCap.append(financeinfo.find('td',{"class":"Fz(s) Fw(500) Ta(end) Pstart(10px) Miw(60px)"}).get_text())
-print(ticker)
-print(mCap)
+    try:
+        print(TK+","+financeinfo.find('td',{"class":"Fz(s) Fw(500) Ta(end) Pstart(10px) Miw(60px)"}).get_text())
+        mCap.append(financeinfo.find('td',{"class":"Fz(s) Fw(500) Ta(end) Pstart(10px) Miw(60px)"}).get_text())
+    except:
+        mCap.append("N/A")
+    
+df = pandas.DataFrame({'Name':name,'Ticker':ticker,'Market Cap':mCap}) 
+df.to_excel("python scraper/stonks.xlsx")
